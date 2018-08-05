@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
-import './pages/product_info.dart';
+import './product_info.dart';
 
-typedef DeleteFn = void Function(int i);
+class ProductCard extends StatelessWidget {
+  final Map<String, dynamic> product;
+  final int index;
+  final Function deleteProduct;
 
-class Products extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
-  final DeleteFn deleteProduct;
+  ProductCard(this.product, this.index, this.deleteProduct);
 
-  Products(this.products, {this.deleteProduct});
-
-  Widget _buildProductItem(BuildContext context, int index) {
+  @override
+  Widget build(BuildContext context) {
     return Card(
       child: Column(
         children: <Widget>[
-          ProductInfo(products[index]),
+          ProductInfo(product),
           ButtonBar(
             alignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -35,15 +35,5 @@ class Products extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return products.length > 0
-        ? ListView.builder(
-            itemBuilder: _buildProductItem,
-            itemCount: products.length,
-          )
-        : Center(child: Text('No products, add some.'));
   }
 }

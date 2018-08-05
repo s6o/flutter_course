@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import './product_info.dart';
+import '../widgets/product_info.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final int index;
