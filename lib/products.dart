@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import './pages/product_info.dart';
+
 typedef DeleteFn = void Function(int i);
 
 class Products extends StatelessWidget {
@@ -12,17 +14,22 @@ class Products extends StatelessWidget {
     return Card(
       child: Column(
         children: <Widget>[
-          Image.asset(products[index]['image']),
-          Text(products[index]['title']),
+          ProductInfo(products[index]),
           ButtonBar(
             alignment: MainAxisAlignment.center,
             children: <Widget>[
-              FlatButton(
-                child: Text('Details'),
+              IconButton(
+                color: Theme.of(context).primaryColor,
+                icon: Icon(Icons.info),
                 onPressed: () => Navigator
                     .pushNamed<int>(context, '/product/' + index.toString())
                     .then<void>((int rindex) => deleteProduct(rindex)),
-              )
+              ),
+              IconButton(
+                color: Colors.red,
+                icon: Icon(Icons.favorite),
+                onPressed: () {},
+              ),
             ],
           )
         ],

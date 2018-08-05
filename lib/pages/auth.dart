@@ -18,33 +18,54 @@ class _AuthPageState extends State<AuthPage> {
         title: Text('Authenticate'),
       ),
       body: Container(
-        margin: EdgeInsets.all(10.0),
-        child: ListView(
-          children: <Widget>[
-            TextField(
-              decoration: InputDecoration(labelText: 'Email'),
-              keyboardType: TextInputType.emailAddress,
-              onChanged: (String v) => setState(() => _email = v),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+                Colors.black.withOpacity(0.4), BlendMode.dstATop),
+            image: AssetImage('assets/background.jpg'),
+          ),
+        ),
+        padding: EdgeInsets.all(10.0),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                TextField(
+                  decoration: InputDecoration(
+                      labelText: 'Email',
+                      filled: true,
+                      fillColor: Colors.white),
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (String v) => setState(() => _email = v),
+                ),
+                SizedBox(
+                  height: 11.0,
+                ),
+                TextField(
+                  decoration: InputDecoration(
+                      labelText: 'Password',
+                      filled: true,
+                      fillColor: Colors.white),
+                  obscureText: true,
+                  onChanged: (String v) => setState(() => _password = v),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                RaisedButton(
+                  child: Text('LOGIN'),
+                  color: Theme.of(context).accentColor,
+                  textColor: Colors.yellowAccent,
+                  onPressed: () {
+                    print(_email);
+                    print(_password);
+                    Navigator.pushReplacementNamed(context, '/all');
+                  },
+                ),
+              ],
             ),
-            TextField(
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-              onChanged: (String v) => setState(() => _password = v),
-            ),
-            SizedBox(
-              height: 10.0,
-            ),
-            RaisedButton(
-              child: Text('LOGIN'),
-              color: Theme.of(context).accentColor,
-              textColor: Colors.yellowAccent,
-              onPressed: () {
-                print(_email);
-                print(_password);
-                Navigator.pushReplacementNamed(context, '/all');
-              },
-            ),
-          ],
+          ),
         ),
       ),
     );

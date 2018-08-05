@@ -20,6 +20,7 @@ class ProductsPage extends StatelessWidget {
               title: Text('Choose'),
             ),
             ListTile(
+              leading: Icon(Icons.edit),
               title: Text('Manage Products'),
               onTap: () => Navigator.pushNamed(context, '/admin'),
             ),
@@ -27,7 +28,13 @@ class ProductsPage extends StatelessWidget {
         ),
       ),
       appBar: AppBar(
-        title: Text('Easy List'),
+        title: Text('Products'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.favorite),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: AllProducts(products, addProduct, deleteProduct),
     );

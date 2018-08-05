@@ -4,10 +4,12 @@ import 'package:flutter/rendering.dart';
 import './pages/auth.dart';
 import './pages/admin.dart';
 import './pages/products.dart';
-import './pages/product.dart';
+import './pages/product_detail.dart';
 
 void main() {
   debugPaintSizeEnabled = false;
+  debugPaintBaselinesEnabled = false;
+  debugPaintPointersEnabled = false;
   runApp(MyApp());
 }
 
@@ -58,10 +60,9 @@ class _MyAppState extends State<MyApp> {
           final int index = int.tryParse(pathElements[2]);
           if (index != null) {
             return MaterialPageRoute<int>(
-              builder: (context) => ProductPage(
+              builder: (context) => ProductDetailPage(
                     index,
-                    _products[index]['title'],
-                    _products[index]['image'],
+                    _products[index],
                   ),
             );
           } else {
