@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 typedef DeleteFn = void Function(int i);
 
 class Products extends StatelessWidget {
-  final List<Map<String, String>> products;
+  final List<Map<String, dynamic>> products;
   final DeleteFn deleteProduct;
 
   Products(this.products, {this.deleteProduct});

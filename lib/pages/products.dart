@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../product_manager.dart';
+import '../all_products.dart';
 
 class ProductsPage extends StatelessWidget {
-  final List<Map<String, String>> products;
+  final List<Map<String, dynamic>> products;
   final Function addProduct;
   final Function deleteProduct;
 
@@ -29,7 +29,7 @@ class ProductsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Easy List'),
       ),
-      body: ProductManager(products, addProduct, deleteProduct),
+      body: AllProducts(products, addProduct, deleteProduct),
     );
   }
 }
