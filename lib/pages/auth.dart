@@ -8,8 +8,11 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
-  String _email;
-  String _password;
+  final Map<String, String> _formData = {
+    'email': null,
+    'password': null,
+  };
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -31,41 +34,44 @@ class _AuthPageState extends State<AuthPage> {
           child: SingleChildScrollView(
             child: Container(
               width: MediaQuery.of(context).size.width * 0.8,
-              child: Column(
-                children: <Widget>[
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: 'Email',
-                        filled: true,
-                        fillColor: Colors.white),
-                    keyboardType: TextInputType.emailAddress,
-                    onChanged: (String v) => setState(() => _email = v),
-                  ),
-                  SizedBox(
-                    height: 11.0,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: 'Password',
-                        filled: true,
-                        fillColor: Colors.white),
-                    obscureText: true,
-                    onChanged: (String v) => setState(() => _password = v),
-                  ),
-                  SizedBox(
-                    height: 10.0,
-                  ),
-                  RaisedButton(
-                    child: Text('LOGIN'),
-                    color: Theme.of(context).accentColor,
-                    textColor: Colors.yellowAccent,
-                    onPressed: () {
-                      print(_email);
-                      print(_password);
-                      Navigator.pushReplacementNamed(context, '/all');
-                    },
-                  ),
-                ],
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    TextFormField(
+                      decoration: InputDecoration(
+                          labelText: 'Email',
+                          filled: true,
+                          fillColor: Colors.white),
+                      keyboardType: TextInputType.emailAddress,
+                      onSaved: (String v) => _formData['email'] = v,
+                    ),
+                    SizedBox(
+                      height: 11.0,
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(
+                          labelText: 'Password',
+                          filled: true,
+                          fillColor: Colors.white),
+                      obscureText: true,
+                      onSaved: (String v) => _formData['password'] = v,
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    RaisedButton(
+                      child: Text('LOGIN'),
+                      color: Theme.of(context).accentColor,
+                      textColor: Colors.yellowAccent,
+                      onPressed: () {
+                        //if (_formKey.currentState.validate()) {
+                        Navigator.pushReplacementNamed(context, '/all');
+                        //}
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
