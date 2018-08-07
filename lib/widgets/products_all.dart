@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
 import './product_card.dart';
+import '../models/product.dart';
 
 typedef DeleteFn = void Function(int i);
 
 class ProductsAll extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+  final List<Product> products;
   final DeleteFn deleteProduct;
 
   ProductsAll(this.products, {this.deleteProduct});

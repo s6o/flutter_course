@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../models/product.dart';
+
 class ProductInfo extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Product product;
   final bool withDescription;
 
   ProductInfo(this.product, {this.withDescription = false});
@@ -10,14 +12,14 @@ class ProductInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Image.asset(product['image']),
+        Image.asset(product.image),
         Container(
           padding: EdgeInsets.only(top: 10.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                product['title'],
+                product.title,
                 style: TextStyle(
                     fontSize: 28.0,
                     fontWeight: FontWeight.bold,
@@ -33,7 +35,7 @@ class ProductInfo extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5.0),
                 ),
                 child: Text(
-                  '${product['price'].toString()} €',
+                  '${product.price.toString()} €',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -66,7 +68,7 @@ class ProductInfo extends StatelessWidget {
       return Container(
         margin: EdgeInsets.all(10.0),
         child: Text(
-          product['description'],
+          product.description,
           textAlign: TextAlign.justify,
         ),
       );

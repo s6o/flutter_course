@@ -6,6 +6,8 @@ import './pages/admin.dart';
 import './pages/products.dart';
 import './pages/product_detail.dart';
 
+import './models/product.dart';
+
 void main() {
   debugPaintSizeEnabled = false;
   debugPaintBaselinesEnabled = false;
@@ -21,9 +23,9 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final List<Map<String, dynamic>> _products = [];
+  final List<Product> _products = [];
 
-  void _addProduct(Map<String, dynamic> product) {
+  void _addProduct(Product product) {
     setState(() {
       _products.add(product);
     });
@@ -37,7 +39,7 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  void _updateProduct(Map<String, dynamic> product, int index) {
+  void _updateProduct(Product product, int index) {
     setState(() {
       _products[index] = product;
     });

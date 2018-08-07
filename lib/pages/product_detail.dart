@@ -2,10 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../widgets/product_info.dart';
+import '../models/product.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final int index;
-  final Map<String, dynamic> product;
+  final Product product;
 
   ProductDetailPage(this.index, this.product);
 

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import '../models/product.dart';
 
 class ProductEditPage extends StatefulWidget {
   final Function addProduct;
   final Function deleteProduct;
   final Function updateProduct;
-  final Map<String, dynamic> product;
+  final Product product;
   final int productIndex;
 
   ProductEditPage(
@@ -45,10 +46,19 @@ class _ProductCreatePageState extends State<ProductEditPage> {
     if (widget.product == null) {
       return '';
     } else {
-      if (widget.product[key] is double) {
-        return widget.product[key].toString();
+      switch (key) {
+        case 'title':
+          return widget.product.title;
+          break;
+        case 'description':
+          return widget.product.description;
+          break;
+        case 'price':
+          return widget.product.price.toString();
+          break;
+        default:
+          return '';
       }
-      return widget.product[key];
     }
   }
 
@@ -87,6 +97,11 @@ class _ProductCreatePageState extends State<ProductEditPage> {
                 maxLines: 4,
                 onSaved: (String v) => _formData['description'] = v,
                 initialValue: _initialValue('description'),
+                validator: (String v) {
+                  if (v.isEmpty) {
+                    return 'A description is required.';
+                  }
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Price'),
@@ -110,9 +125,10 @@ class _ProductCreatePageState extends State<ProductEditPage> {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
                     if (widget.productIndex == null) {
-                      widget.addProduct(_formData);
+                      widget.addProduct(Product.fromMap(_formData));
                     } else {
-                      widget.updateProduct(_formData, widget.productIndex);
+                      widget.updateProduct(
+                          Product.fromMap(_formData), widget.productIndex);
                     }
                     Navigator.pushReplacementNamed(context, '/admin');
                   }
