@@ -15,6 +15,7 @@ class ProductsModel extends Model {
 
   void addProduct(Product product) {
     _products.add(product);
+    notifyListeners();
   }
 
   void deleteProduct() {
@@ -23,8 +24,26 @@ class ProductsModel extends Model {
         _products.length >= _selectedIndex + 1) {
       _products.removeAt(_selectedIndex);
       _selectedIndex = null;
+      notifyListeners();
     } else {
       print('deleteProduct called with an invalid selectedIndex');
+    }
+  }
+
+  ProductsModel selectProduct(int index) {
+    _selectedIndex = index;
+    return this;
+  }
+
+  void toggleFavorite() {
+    if (_selectedIndex != null) {
+      final bool favStatus = _products[_selectedIndex].isFavorite;
+      _products[_selectedIndex] = Product.fromProductWithFavorite(
+          _products[_selectedIndex], !favStatus);
+      _selectedIndex = null;
+      notifyListeners();
+    } else {
+      print('toggleFavorite called with an invalid selectedIndex');
     }
   }
 
@@ -32,13 +51,9 @@ class ProductsModel extends Model {
     if (_selectedIndex != null && _selectedIndex >= 0) {
       _products[selectedIndex] = product;
       _selectedIndex = null;
+      notifyListeners();
     } else {
       print('updateProduct called with an invalid selectedIndex');
     }
-  }
-
-  ProductsModel selectProduct(int index) {
-    _selectedIndex = index;
-    return this;
   }
 }
