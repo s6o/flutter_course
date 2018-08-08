@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 import '../widgets/product_info.dart';
-import '../models/product.dart';
+import '../scoped-models/products_model.dart';
 
 class ProductDetailPage extends StatelessWidget {
   final int index;
-  final Product product;
 
-  ProductDetailPage(this.index, this.product);
+  ProductDetailPage(this.index);
 
-  void _showConfirmationDialog(BuildContext context) {
+  void _showConfirmationDialog(BuildContext context, ProductsModel model) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -42,26 +42,31 @@ class ProductDetailPage extends StatelessWidget {
         Navigator.pop(context, -1);
         return Future.value(false);
       },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('Product Detail'),
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            ProductInfo(
-              product,
-              withDescription: true,
+      child: ScopedModelDescendant<ProductsModel>(
+        builder: (BuildContext context, Widget child, ProductsModel model) {
+          return Scaffold(
+            appBar: AppBar(
+              title: Text('Product Detail'),
             ),
-            Container(
-              padding: EdgeInsets.all(10.0),
-              child: RaisedButton(
-                child: Text('DELETE'),
-                onPressed: () => _showConfirmationDialog(context),
-              ),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                ProductInfo(
+                  model.products[index],
+                  withDescription: true,
+                ),
+                Container(
+                  padding: EdgeInsets.all(10.0),
+                  child: RaisedButton(
+                    child: Text('DELETE'),
+                    textColor: Colors.yellowAccent,
+                    onPressed: () => _showConfirmationDialog(context, model),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

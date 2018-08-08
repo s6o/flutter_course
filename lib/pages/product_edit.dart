@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+
 import '../models/product.dart';
+import '../scoped-models/products_model.dart';
 
 class ProductEditPage extends StatefulWidget {
-  final Function addProduct;
-  final Function deleteProduct;
-  final Function updateProduct;
-  final Product product;
-  final int productIndex;
-
-  ProductEditPage(
-      {this.addProduct,
-      this.deleteProduct,
-      this.updateProduct,
-      this.product,
-      this.productIndex});
-
   @override
   State<StatefulWidget> createState() {
     return _ProductCreatePageState();
@@ -32,29 +22,34 @@ class _ProductCreatePageState extends State<ProductEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.product == null
-        ? _buildTabContent(context)
-        : Scaffold(
-            appBar: AppBar(
-              title: Text('Edit Product'),
-            ),
-            body: _buildTabContent(context),
-          );
+    return ScopedModelDescendant<ProductsModel>(
+      builder: (BuildContext context, Widget child, ProductsModel model) {
+        return model.selectedIndex == null
+            ? _buildTabContent(context, model)
+            : Scaffold(
+                appBar: AppBar(
+                  title: Text('Edit Product'),
+                ),
+                body: _buildTabContent(context, model),
+              );
+      },
+    );
   }
 
-  String _initialValue(String key) {
-    if (widget.product == null) {
+  String _initialValue(String key, ProductsModel model) {
+    if (model.selectedIndex == null) {
       return '';
     } else {
+      final Product product = model.products[model.selectedIndex];
       switch (key) {
         case 'title':
-          return widget.product.title;
+          return product.title;
           break;
         case 'description':
-          return widget.product.description;
+          return product.description;
           break;
         case 'price':
-          return widget.product.price.toString();
+          return product.price.toString();
           break;
         default:
           return '';
@@ -62,7 +57,25 @@ class _ProductCreatePageState extends State<ProductEditPage> {
     }
   }
 
-  Widget _buildTabContent(BuildContext context) {
+  Widget _buildSaveButton(BuildContext context, ProductsModel model) {
+    return RaisedButton(
+      child: Text('SAVE'),
+      textColor: Colors.yellowAccent,
+      onPressed: () {
+        if (_formKey.currentState.validate()) {
+          _formKey.currentState.save();
+          if (model.selectedIndex == null) {
+            model.addProduct(Product.fromMap(_formData));
+          } else {
+            model.updateProduct(Product.fromMap(_formData));
+          }
+          Navigator.pushReplacementNamed(context, '/admin');
+        }
+      },
+    );
+  }
+
+  Widget _buildTabContent(BuildContext context, ProductsModel model) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth =
         MediaQuery.of(context).orientation == Orientation.landscape
@@ -83,7 +96,7 @@ class _ProductCreatePageState extends State<ProductEditPage> {
             children: <Widget>[
               TextFormField(
                 decoration: InputDecoration(labelText: 'Title'),
-                initialValue: _initialValue('title'),
+                initialValue: _initialValue('title', model),
                 onSaved: (String v) => _formData['title'] = v,
                 validator: (String v) {
                   if (v.isEmpty) {
@@ -96,7 +109,7 @@ class _ProductCreatePageState extends State<ProductEditPage> {
                 decoration: InputDecoration(labelText: 'Description'),
                 maxLines: 4,
                 onSaved: (String v) => _formData['description'] = v,
-                initialValue: _initialValue('description'),
+                initialValue: _initialValue('description', model),
                 validator: (String v) {
                   if (v.isEmpty) {
                     return 'A description is required.';
@@ -113,27 +126,12 @@ class _ProductCreatePageState extends State<ProductEditPage> {
                   }
                   return null;
                 },
-                initialValue: _initialValue('price'),
+                initialValue: _initialValue('price', model),
               ),
               SizedBox(
                 height: 10.0,
               ),
-              RaisedButton(
-                child: Text('SAVE'),
-                textColor: Colors.yellowAccent,
-                onPressed: () {
-                  if (_formKey.currentState.validate()) {
-                    _formKey.currentState.save();
-                    if (widget.productIndex == null) {
-                      widget.addProduct(Product.fromMap(_formData));
-                    } else {
-                      widget.updateProduct(
-                          Product.fromMap(_formData), widget.productIndex);
-                    }
-                    Navigator.pushReplacementNamed(context, '/admin');
-                  }
-                },
-              ),
+              _buildSaveButton(context, model),
             ],
           ),
         ),

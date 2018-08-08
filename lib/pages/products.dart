@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
 
-import '../widgets/products_all.dart';
+import '../widgets/product_card.dart';
 import '../models/product.dart';
+import '../scoped-models/products_model.dart';
 
 class ProductsPage extends StatelessWidget {
-  final List<Product> products;
-  final Function addProduct;
-  final Function deleteProduct;
-
-  ProductsPage(this.products, this.addProduct, this.deleteProduct);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +33,23 @@ class ProductsPage extends StatelessWidget {
           ),
         ],
       ),
-      body: ProductsAll(products, deleteProduct: deleteProduct),
+      body: ScopedModelDescendant<ProductsModel>(
+        builder: (BuildContext context, Widget child, ProductsModel model) {
+          return _buildProductList(context, model);
+        },
+      ),
     );
+  }
+
+  Widget _buildProductList(BuildContext context, ProductsModel model) {
+    final List<Product> products = model.products;
+
+    return products.length > 0
+        ? ListView.builder(
+            itemBuilder: (BuildContext context, int index) =>
+                ProductCard(index),
+            itemCount: products.length,
+          )
+        : Center(child: Text('No products, add some.'));
   }
 }
