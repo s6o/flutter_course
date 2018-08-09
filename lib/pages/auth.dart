@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:scoped_model/scoped_model.dart';
+
+import '../scoped-models/main_model.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -45,6 +48,11 @@ class _AuthPageState extends State<AuthPage> {
                           fillColor: Colors.white),
                       keyboardType: TextInputType.emailAddress,
                       onSaved: (String v) => _formData['email'] = v,
+                      validator: (String v) {
+                        if (v.isEmpty) {
+                          return 'Non empty email address is required.';
+                        }
+                      },
                     ),
                     SizedBox(
                       height: 11.0,
@@ -56,20 +64,34 @@ class _AuthPageState extends State<AuthPage> {
                           fillColor: Colors.white),
                       obscureText: true,
                       onSaved: (String v) => _formData['password'] = v,
+                      validator: (String v) {
+                        if (v.isEmpty) {
+                          return 'Non empty email address is required.';
+                        }
+                      },
                     ),
                     SizedBox(
                       height: 10.0,
                     ),
-                    RaisedButton(
-                      child: Text('LOGIN'),
-                      color: Theme.of(context).accentColor,
-                      textColor: Colors.yellowAccent,
-                      onPressed: () {
-                        //if (_formKey.currentState.validate()) {
-                        Navigator.pushReplacementNamed(context, '/all');
-                        //}
+                    ScopedModelDescendant<MainModel>(
+                      builder: (BuildContext context, Widget child,
+                          MainModel model) {
+                        return RaisedButton(
+                          child: Text('LOGIN'),
+                          color: Theme.of(context).accentColor,
+                          textColor: Colors.yellowAccent,
+                          onPressed: () {
+                            if (!_formKey.currentState.validate()) {
+                              return;
+                            }
+                            _formKey.currentState.save();
+                            model.login(
+                                _formData['email'], _formData['password']);
+                            Navigator.pushReplacementNamed(context, '/all');
+                          },
+                        );
                       },
-                    ),
+                    )
                   ],
                 ),
               ),
