@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../models/product.dart';
+import '../models/user_product.dart';
 import '../scoped-models/main_model.dart';
 
 class ProductEditPage extends StatefulWidget {
@@ -65,11 +66,14 @@ class _ProductEditState extends State<ProductEditPage> {
         if (_formKey.currentState.validate()) {
           _formKey.currentState.save();
           if (model.selectedIndex == null) {
-            model.addProduct(Product.fromMap(_formData));
+            model.addProduct(UserProduct(
+                model.user.id, model.user.email, Product.fromMap(_formData)));
           } else {
-            model.updateProduct(Product.fromProductWithFavorite(
-                Product.fromMap(_formData),
-                model.products[model.selectedIndex].isFavorite));
+            model.updateProduct(UserProduct(
+                model.user.id,
+                model.user.email,
+                Product.fromProductWithFavorite(Product.fromMap(_formData),
+                    model.products[model.selectedIndex].isFavorite)));
           }
           Navigator.pushReplacementNamed(context, '/admin');
         }

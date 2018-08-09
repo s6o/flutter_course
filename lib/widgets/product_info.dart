@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../models/product.dart';
+import '../models/user_product.dart';
 
 class ProductInfo extends StatelessWidget {
-  final Product product;
+  final UserProduct product;
   final bool withDescription;
 
   ProductInfo(this.product, {this.withDescription = false});
@@ -59,6 +59,10 @@ class ProductInfo extends StatelessWidget {
             ],
           ),
         ),
+        SizedBox(
+          height: 10.0,
+        ),
+        Text('Added by: ${product.userEmail}')
       ],
     );
   }

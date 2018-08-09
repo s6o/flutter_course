@@ -1,5 +1,6 @@
 import 'package:scoped_model/scoped_model.dart';
 import '../models/product.dart';
+import '../models/user_product.dart';
 
 class ProductsModel extends Model {
   List<Product> _products = [];
@@ -44,7 +45,7 @@ class ProductsModel extends Model {
 
   ProductsModel selectProduct(int index) {
     _selectedIndex = index;
-    if (_selectedIndex != null) {
+    if (_selectedIndex != null && _selectedIndex >= 0) {
       notifyListeners();
     }
     return this;
@@ -53,8 +54,14 @@ class ProductsModel extends Model {
   void toggleFavorite() {
     if (_selectedIndex != null) {
       final bool favStatus = _products[_selectedIndex].isFavorite;
-      _products[_selectedIndex] = Product.fromProductWithFavorite(
-          _products[_selectedIndex], !favStatus);
+      // TODO: extract to a generic, so that new types won't require another 'is' check
+      if (_products[_selectedIndex] is UserProduct) {
+        _products[_selectedIndex] = UserProduct.fromUserProductWithFavorite(
+            _products[_selectedIndex], !favStatus);
+      } else {
+        _products[_selectedIndex] = Product.fromProductWithFavorite(
+            _products[_selectedIndex], !favStatus);
+      }
       _selectedIndex = null;
       notifyListeners();
     } else {

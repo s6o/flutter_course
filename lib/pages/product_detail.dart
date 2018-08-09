@@ -51,10 +51,12 @@ class ProductDetailPage extends StatelessWidget {
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                ProductInfo(
-                  model.products[index],
-                  withDescription: true,
-                ),
+                model.products.length > 0
+                    ? ProductInfo(
+                        model.products[index],
+                        withDescription: true,
+                      )
+                    : Container(),
                 Container(
                   padding: EdgeInsets.all(10.0),
                   child: RaisedButton(

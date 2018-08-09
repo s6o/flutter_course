@@ -28,8 +28,11 @@ class ProductCard extends StatelessWidget {
                   onPressed: () {
                     Navigator
                         .pushNamed<int>(context, '/product/' + index.toString())
-                        .then<void>((int rindex) =>
-                            model.selectProduct(rindex)..deleteProduct());
+                        .then<void>((int rindex) {
+                      if (rindex >= 0) {
+                        model.selectProduct(rindex)..deleteProduct();
+                      }
+                    });
                   },
                 ),
                 IconButton(
