@@ -14,7 +14,7 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<ProductsModel>(
         builder: (BuildContext context, Widget child, ProductsModel model) {
-      final Product product = model.products[index];
+      final Product product = model.displayedProducts[index];
       return Card(
         child: Column(
           children: <Widget>[

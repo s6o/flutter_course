@@ -4,8 +4,20 @@ import '../models/product.dart';
 class ProductsModel extends Model {
   List<Product> _products = [];
   int _selectedIndex;
+  bool _showFavorites = false;
 
   List<Product> get products {
+    return List.from(_products);
+  }
+
+  bool get displayFavoritesOnly {
+    return _showFavorites;
+  }
+
+  List<Product> get displayedProducts {
+    if (_showFavorites) {
+      return _products.where((Product p) => p.isFavorite == true).toList();
+    }
     return List.from(_products);
   }
 
@@ -32,6 +44,7 @@ class ProductsModel extends Model {
 
   ProductsModel selectProduct(int index) {
     _selectedIndex = index;
+    notifyListeners();
     return this;
   }
 
@@ -45,6 +58,11 @@ class ProductsModel extends Model {
     } else {
       print('toggleFavorite called with an invalid selectedIndex');
     }
+  }
+
+  void toggleShowFavaorites() {
+    _showFavorites = !_showFavorites;
+    notifyListeners();
   }
 
   void updateProduct(Product product) {

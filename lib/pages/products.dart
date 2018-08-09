@@ -27,10 +27,15 @@ class ProductsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Products'),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.favorite),
-            onPressed: () {},
-          ),
+          ScopedModelDescendant<ProductsModel>(builder:
+              (BuildContext context, Widget child, ProductsModel model) {
+            return IconButton(
+              icon: Icon(model.displayFavoritesOnly
+                  ? Icons.favorite
+                  : Icons.favorite_border),
+              onPressed: () => model.toggleShowFavaorites(),
+            );
+          }),
         ],
       ),
       body: ScopedModelDescendant<ProductsModel>(
@@ -42,7 +47,7 @@ class ProductsPage extends StatelessWidget {
   }
 
   Widget _buildProductList(BuildContext context, ProductsModel model) {
-    final List<Product> products = model.products;
+    final List<Product> products = model.displayedProducts;
 
     return products.length > 0
         ? ListView.builder(

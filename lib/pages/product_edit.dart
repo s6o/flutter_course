@@ -67,7 +67,9 @@ class _ProductCreatePageState extends State<ProductEditPage> {
           if (model.selectedIndex == null) {
             model.addProduct(Product.fromMap(_formData));
           } else {
-            model.updateProduct(Product.fromMap(_formData));
+            model.updateProduct(Product.fromProductWithFavorite(
+                Product.fromMap(_formData),
+                model.products[model.selectedIndex].isFavorite));
           }
           Navigator.pushReplacementNamed(context, '/admin');
         }
@@ -83,56 +85,59 @@ class _ProductCreatePageState extends State<ProductEditPage> {
             : deviceWidth;
     final double targetPadding = deviceWidth - targetWidth;
 
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
-      },
-      child: Container(
-        margin: EdgeInsets.all(10.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
-            children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Title'),
-                initialValue: _initialValue('title', model),
-                onSaved: (String v) => _formData['title'] = v,
-                validator: (String v) {
-                  if (v.isEmpty) {
-                    return 'A non-empty product title is required.';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Description'),
-                maxLines: 4,
-                onSaved: (String v) => _formData['description'] = v,
-                initialValue: _initialValue('description', model),
-                validator: (String v) {
-                  if (v.isEmpty) {
-                    return 'A description is required.';
-                  }
-                },
-              ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Price'),
-                keyboardType: TextInputType.number,
-                onSaved: (String v) => _formData['price'] = double.tryParse(v),
-                validator: (String v) {
-                  if (double.tryParse(v) == null) {
-                    return 'Incorrect price format.';
-                  }
-                  return null;
-                },
-                initialValue: _initialValue('price', model),
-              ),
-              SizedBox(
-                height: 10.0,
-              ),
-              _buildSaveButton(context, model),
-            ],
+    return Card(
+      child: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).requestFocus(FocusNode());
+        },
+        child: Container(
+          margin: EdgeInsets.all(10.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
+              children: <Widget>[
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Title'),
+                  initialValue: _initialValue('title', model),
+                  onSaved: (String v) => _formData['title'] = v,
+                  validator: (String v) {
+                    if (v.isEmpty) {
+                      return 'A non-empty product title is required.';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Description'),
+                  maxLines: 4,
+                  onSaved: (String v) => _formData['description'] = v,
+                  initialValue: _initialValue('description', model),
+                  validator: (String v) {
+                    if (v.isEmpty) {
+                      return 'A description is required.';
+                    }
+                  },
+                ),
+                TextFormField(
+                  decoration: InputDecoration(labelText: 'Price'),
+                  keyboardType: TextInputType.number,
+                  onSaved: (String v) =>
+                      _formData['price'] = double.tryParse(v),
+                  validator: (String v) {
+                    if (double.tryParse(v) == null) {
+                      return 'Incorrect price format.';
+                    }
+                    return null;
+                  },
+                  initialValue: _initialValue('price', model),
+                ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                _buildSaveButton(context, model),
+              ],
+            ),
           ),
         ),
       ),
