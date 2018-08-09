@@ -44,7 +44,9 @@ class ProductsModel extends Model {
 
   ProductsModel selectProduct(int index) {
     _selectedIndex = index;
-    notifyListeners();
+    if (_selectedIndex != null) {
+      notifyListeners();
+    }
     return this;
   }
 

@@ -7,11 +7,11 @@ import '../scoped-models/main_model.dart';
 class ProductEditPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _ProductCreatePageState();
+    return _ProductEditState();
   }
 }
 
-class _ProductCreatePageState extends State<ProductEditPage> {
+class _ProductEditState extends State<ProductEditPage> {
   final Map<String, dynamic> _formData = {
     'title': null,
     'description': null,

@@ -41,7 +41,7 @@ class ProductListPage extends StatelessWidget {
                             model.selectProduct(index);
                             return ProductEditPage();
                           }),
-                        );
+                        ).then((_) => model.selectProduct(null));
                       },
                     ),
                   ),
