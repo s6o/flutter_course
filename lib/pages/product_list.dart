@@ -4,13 +4,13 @@ import 'package:scoped_model/scoped_model.dart';
 
 import './product_edit.dart';
 import '../models/product.dart';
-import '../scoped-models/products_model.dart';
+import '../scoped-models/main_model.dart';
 
 class ProductListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant(
-      builder: (BuildContext context, Widget child, ProductsModel model) {
+      builder: (BuildContext context, Widget child, MainModel model) {
         final List<Product> products = model.products;
 
         return ListView.builder(

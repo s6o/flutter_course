@@ -3,7 +3,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import './product_info.dart';
 import '../models/product.dart';
-import '../scoped-models/products_model.dart';
+import '../scoped-models/main_model.dart';
 
 class ProductCard extends StatelessWidget {
   final int index;
@@ -12,8 +12,8 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductsModel>(
-        builder: (BuildContext context, Widget child, ProductsModel model) {
+    return ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
       final Product product = model.displayedProducts[index];
       return Card(
         child: Column(

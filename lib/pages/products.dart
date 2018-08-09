@@ -3,7 +3,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../widgets/product_card.dart';
 import '../models/product.dart';
-import '../scoped-models/products_model.dart';
+import '../scoped-models/main_model.dart';
 
 class ProductsPage extends StatelessWidget {
   @override
@@ -27,8 +27,8 @@ class ProductsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Products'),
         actions: <Widget>[
-          ScopedModelDescendant<ProductsModel>(builder:
-              (BuildContext context, Widget child, ProductsModel model) {
+          ScopedModelDescendant<MainModel>(
+              builder: (BuildContext context, Widget child, MainModel model) {
             return IconButton(
               icon: Icon(model.displayFavoritesOnly
                   ? Icons.favorite
@@ -38,15 +38,15 @@ class ProductsPage extends StatelessWidget {
           }),
         ],
       ),
-      body: ScopedModelDescendant<ProductsModel>(
-        builder: (BuildContext context, Widget child, ProductsModel model) {
+      body: ScopedModelDescendant<MainModel>(
+        builder: (BuildContext context, Widget child, MainModel model) {
           return _buildProductList(context, model);
         },
       ),
     );
   }
 
-  Widget _buildProductList(BuildContext context, ProductsModel model) {
+  Widget _buildProductList(BuildContext context, MainModel model) {
     final List<Product> products = model.displayedProducts;
 
     return products.length > 0

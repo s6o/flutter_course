@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../models/product.dart';
-import '../scoped-models/products_model.dart';
+import '../scoped-models/main_model.dart';
 
 class ProductEditPage extends StatefulWidget {
   @override
@@ -22,8 +22,8 @@ class _ProductCreatePageState extends State<ProductEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<ProductsModel>(
-      builder: (BuildContext context, Widget child, ProductsModel model) {
+    return ScopedModelDescendant<MainModel>(
+      builder: (BuildContext context, Widget child, MainModel model) {
         return model.selectedIndex == null
             ? _buildTabContent(context, model)
             : Scaffold(
@@ -36,7 +36,7 @@ class _ProductCreatePageState extends State<ProductEditPage> {
     );
   }
 
-  String _initialValue(String key, ProductsModel model) {
+  String _initialValue(String key, MainModel model) {
     if (model.selectedIndex == null) {
       return '';
     } else {
@@ -57,7 +57,7 @@ class _ProductCreatePageState extends State<ProductEditPage> {
     }
   }
 
-  Widget _buildSaveButton(BuildContext context, ProductsModel model) {
+  Widget _buildSaveButton(BuildContext context, MainModel model) {
     return RaisedButton(
       child: Text('SAVE'),
       textColor: Colors.yellowAccent,
@@ -77,7 +77,7 @@ class _ProductCreatePageState extends State<ProductEditPage> {
     );
   }
 
-  Widget _buildTabContent(BuildContext context, ProductsModel model) {
+  Widget _buildTabContent(BuildContext context, MainModel model) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth =
         MediaQuery.of(context).orientation == Orientation.landscape
