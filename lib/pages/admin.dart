@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 import './product_edit.dart';
 import './product_list.dart';
+import './remote_storage.dart';
 
 class AdminPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         drawer: Drawer(
           child: Column(
@@ -31,6 +32,7 @@ class AdminPage extends StatelessWidget {
             tabs: <Widget>[
               Tab(icon: Icon(Icons.create), text: 'Create Product'),
               Tab(icon: Icon(Icons.list), text: 'My Products'),
+              Tab(icon: Icon(Icons.settings_remote), text: 'Remote Storage'),
             ],
           ),
         ),
@@ -38,6 +40,7 @@ class AdminPage extends StatelessWidget {
           children: <Widget>[
             ProductEditPage(),
             ProductListPage(),
+            RemoteStoragePage(),
           ],
         ),
       ),
