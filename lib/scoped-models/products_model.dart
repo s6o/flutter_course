@@ -1,6 +1,10 @@
+import 'dart:convert';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:http/http.dart' as http;
+
 import '../models/product.dart';
 import '../models/user_product.dart';
+import '../models/remote_storage.dart';
 
 class ProductsModel extends Model {
   List<Product> _products = [];
@@ -27,7 +31,24 @@ class ProductsModel extends Model {
   }
 
   void addProduct(Product product) {
-    _products.add(product);
+    RemoteStorage rs = RemoteStorage();
+    rs.readUrl().then((String url) {
+      print('URL: ${url}products.json');
+      print('JSON ${toJson(product)}');
+      http
+          .post(url + 'products.json', body: toJson(product))
+          .then((http.Response response) {
+        if (response.statusCode == 200) {
+          Map<String, dynamic> data = json.decode(response.body);
+          final Product newProduct = product.setId(data['name']);
+          _products.add(newProduct);
+        } else {
+          print('Remote Storage failed: HTTP ${response.statusCode} | ' +
+              response.reasonPhrase);
+          _products.add(product);
+        }
+      });
+    });
     notifyListeners();
   }
 
@@ -72,6 +93,10 @@ class ProductsModel extends Model {
   void toggleShowFavaorites() {
     _showFavorites = !_showFavorites;
     notifyListeners();
+  }
+
+  String toJson<T extends Product>(T product) {
+    return json.encode(product.toMap());
   }
 
   void updateProduct(Product product) {
