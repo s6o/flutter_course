@@ -12,7 +12,12 @@ class ProductInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Image.network(product.image),
+        FadeInImage(
+          image: NetworkImage(product.image),
+          height: 300.0,
+          fit: BoxFit.cover,
+          placeholder: AssetImage('assets/food.jpg'),
+        ),
         Container(
           padding: EdgeInsets.only(top: 10.0),
           child: Row(
