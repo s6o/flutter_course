@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../models/product.dart';
-import '../models/user_product.dart';
 import '../scoped-models/main_model.dart';
 
 class ProductEditPage extends StatefulWidget {
@@ -15,9 +14,9 @@ class ProductEditPage extends StatefulWidget {
 class _ProductEditState extends State<ProductEditPage> {
   final Map<String, dynamic> _formData = {
     'title': null,
-    'description': null,
+    'desc': null,
     'price': null,
-    'image': 'assets/food.jpg',
+    'image': null,
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -46,7 +45,7 @@ class _ProductEditState extends State<ProductEditPage> {
         case 'title':
           return product.title;
           break;
-        case 'description':
+        case 'desc':
           return product.description;
           break;
         case 'price':
@@ -66,14 +65,14 @@ class _ProductEditState extends State<ProductEditPage> {
         if (_formKey.currentState.validate()) {
           _formKey.currentState.save();
           if (model.selectedIndex == null) {
-            model.addProduct(UserProduct(
-                model.user.id, model.user.email, Product.fromMap(_formData)));
+            model.addProduct(Product.fromMapWithUser(
+              _formData,
+              model.user.id,
+              model.user.email,
+            ));
           } else {
-            model.updateProduct(UserProduct(
-                model.user.id,
-                model.user.email,
-                Product.fromProductWithFavorite(Product.fromMap(_formData),
-                    model.products[model.selectedIndex].isFavorite)));
+            model.updateProduct(Product.fromMapWithMerge(
+                _formData, model.products[model.selectedIndex]));
           }
           Navigator.pushReplacementNamed(context, '/admin');
         }
@@ -115,8 +114,8 @@ class _ProductEditState extends State<ProductEditPage> {
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Description'),
                   maxLines: 4,
-                  onSaved: (String v) => _formData['description'] = v,
-                  initialValue: _initialValue('description', model),
+                  onSaved: (String v) => _formData['desc'] = v,
+                  initialValue: _initialValue('desc', model),
                   validator: (String v) {
                     if (v.isEmpty) {
                       return 'A description is required.';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../models/user_product.dart';
+import '../models/product.dart';
 
 class ProductInfo extends StatelessWidget {
-  final UserProduct product;
+  final Product product;
   final bool withDescription;
 
   ProductInfo(this.product, {this.withDescription = false});
@@ -12,7 +12,7 @@ class ProductInfo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        Image.asset(product.image),
+        Image.network(product.image),
         Container(
           padding: EdgeInsets.only(top: 10.0),
           child: Row(

@@ -4,6 +4,7 @@ import 'package:scoped_model/scoped_model.dart';
 import './product_info.dart';
 import '../models/product.dart';
 import '../scoped-models/main_model.dart';
+import '../widgets/sync_button.dart';
 
 class ProductCard extends StatelessWidget {
   final int index;
@@ -44,6 +45,7 @@ class ProductCard extends StatelessWidget {
                     model.selectProduct(index)..toggleFavorite();
                   },
                 ),
+                SyncButton(product, model.syncManually),
               ],
             )
           ],

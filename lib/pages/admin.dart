@@ -3,8 +3,13 @@ import 'package:flutter/material.dart';
 import './product_edit.dart';
 import './product_list.dart';
 import './remote_storage.dart';
+import '../scoped-models/main_model.dart';
 
 class AdminPage extends StatelessWidget {
+  final MainModel model;
+
+  AdminPage(this.model);
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -39,7 +44,7 @@ class AdminPage extends StatelessWidget {
         body: TabBarView(
           children: <Widget>[
             ProductEditPage(),
-            ProductListPage(),
+            ProductListPage(model),
             RemoteStoragePage(),
           ],
         ),

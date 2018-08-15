@@ -5,8 +5,26 @@ import 'package:scoped_model/scoped_model.dart';
 import './product_edit.dart';
 import '../models/product.dart';
 import '../scoped-models/main_model.dart';
+import '../widgets/sync_button.dart';
 
-class ProductListPage extends StatelessWidget {
+class ProductListPage extends StatefulWidget {
+  final MainModel model;
+
+  ProductListPage(this.model);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _ProductListState();
+  }
+}
+
+class _ProductListState extends State<ProductListPage> {
+  @override
+  void initState() {
+    super.initState();
+    widget.model.fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant(
@@ -29,20 +47,27 @@ class ProductListPage extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundImage: AssetImage(products[index].image),
+                      backgroundImage: NetworkImage(products[index].image),
                     ),
                     title: Text(products[index].title),
                     subtitle: Text('${products[index].price} €'),
-                    trailing: IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (BuildContext context) {
-                            model.selectProduct(index);
-                            return ProductEditPage();
-                          }),
-                        ).then((_) => model.selectProduct(null));
-                      },
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        SyncButton(products[index], model.syncManually),
+                        IconButton(
+                          icon: Icon(Icons.edit),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) {
+                                model.selectProduct(index);
+                                return ProductEditPage();
+                              }),
+                            ).then((_) => model.selectProduct(null));
+                          },
+                        ),
+                      ],
                     ),
                   ),
                   Divider(),

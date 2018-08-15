@@ -15,6 +15,10 @@ class RemoteStorage {
     return File('$path/firebase.txt');
   }
 
+  bool isValidUrl(String url) {
+    return url.startsWith('https://') && url.endsWith('firebaseio.com/');
+  }
+
   Future<String> readUrl() async {
     try {
       final file = await _localFile;

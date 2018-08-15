@@ -2,10 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import '../widgets/product_card.dart';
-import '../models/product.dart';
 import '../scoped-models/main_model.dart';
 
-class ProductsPage extends StatelessWidget {
+class ProductsPage extends StatefulWidget {
+  final MainModel model;
+
+  ProductsPage(this.model);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _ProductsState();
+  }
+}
+
+class _ProductsState extends State<ProductsPage> {
+  @override
+  void initState() {
+    super.initState();
+    widget.model.fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,13 +63,11 @@ class ProductsPage extends StatelessWidget {
   }
 
   Widget _buildProductList(BuildContext context, MainModel model) {
-    final List<Product> products = model.displayedProducts;
-
-    return products.length > 0
+    return model.displayedProducts.length > 0
         ? ListView.builder(
             itemBuilder: (BuildContext context, int index) =>
                 ProductCard(index),
-            itemCount: products.length,
+            itemCount: model.displayedProducts.length,
           )
         : Center(child: Text('No products, add some.'));
   }
