@@ -56,7 +56,9 @@ class _ProductsState extends State<ProductsPage> {
       ),
       body: ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-          return _buildProductList(context, model);
+          return RefreshIndicator(
+              onRefresh: model.fetchProducts,
+              child: _buildProductList(context, model));
         },
       ),
     );

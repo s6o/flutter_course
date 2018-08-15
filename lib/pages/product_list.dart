@@ -31,51 +31,54 @@ class _ProductListState extends State<ProductListPage> {
       builder: (BuildContext context, Widget child, MainModel model) {
         final List<Product> products = model.products;
 
-        return ListView.builder(
-          itemBuilder: (BuildContext context, int index) {
-            return Dismissible(
-              key: Key(
-                  '${index.toString()}-${DateTime.now().toIso8601String()}'),
-              background: Container(color: Colors.red),
-              direction: DismissDirection.endToStart,
-              onDismissed: (DismissDirection direction) {
-                if (direction == DismissDirection.endToStart) {
-                  model.selectProduct(index)..deleteProduct();
-                }
-              },
-              child: Column(
-                children: <Widget>[
-                  ListTile(
-                    leading: CircleAvatar(
-                      backgroundImage: NetworkImage(products[index].image),
+        return RefreshIndicator(
+          onRefresh: model.fetchProducts,
+          child: ListView.builder(
+            itemBuilder: (BuildContext context, int index) {
+              return Dismissible(
+                key: Key(
+                    '${index.toString()}-${DateTime.now().toIso8601String()}'),
+                background: Container(color: Colors.red),
+                direction: DismissDirection.endToStart,
+                onDismissed: (DismissDirection direction) {
+                  if (direction == DismissDirection.endToStart) {
+                    model.selectProduct(index)..deleteProduct();
+                  }
+                },
+                child: Column(
+                  children: <Widget>[
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: NetworkImage(products[index].image),
+                      ),
+                      title: Text(products[index].title),
+                      subtitle: Text('${products[index].price} €'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          SyncButton(products[index], model.syncProduct),
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (BuildContext context) {
+                                  model.selectProduct(index);
+                                  return ProductEditPage();
+                                }),
+                              ).then((_) => model.selectProduct(null));
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                    title: Text(products[index].title),
-                    subtitle: Text('${products[index].price} €'),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        SyncButton(products[index], model.syncManually),
-                        IconButton(
-                          icon: Icon(Icons.edit),
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) {
-                                model.selectProduct(index);
-                                return ProductEditPage();
-                              }),
-                            ).then((_) => model.selectProduct(null));
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  Divider(),
-                ],
-              ),
-            );
-          },
-          itemCount: products.length,
+                    Divider(),
+                  ],
+                ),
+              );
+            },
+            itemCount: products.length,
+          ),
         );
       },
     );

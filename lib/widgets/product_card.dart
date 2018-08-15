@@ -45,7 +45,7 @@ class ProductCard extends StatelessWidget {
                     model.selectProduct(index)..toggleFavorite();
                   },
                 ),
-                SyncButton(product, model.syncManually),
+                SyncButton(product, model.syncProduct),
               ],
             )
           ],

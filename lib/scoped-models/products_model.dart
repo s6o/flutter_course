@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
@@ -45,46 +46,50 @@ class ProductsModel extends Model {
 
       _products[delProduct.localId] = delProduct.toTrash();
       _selectedIndex = null;
-      syncManually(delProduct);
+      syncProduct(delProduct);
       notifyListeners();
     }
   }
 
-  void fetchProducts() async {
+  Future<Null> fetchProducts() async {
     print('Fetching remote products...');
 
     RemoteStorage rs = RemoteStorage();
-    String url = await rs.readUrl();
+    rs.readUrl().then((String url) {
+      if (rs.isValidUrl(url)) {
+        return http.get(url + 'products.json').then((http.Response response) {
+          if (response.statusCode == 200) {
+            Map<String, dynamic> data = json.decode(response.body);
+            if (data != null) {
+              final List<Product> remoteProducts = data
+                  .map((String id, dynamic m) {
+                    Product product = Product.fromMap(m);
+                    return MapEntry(id, product);
+                  })
+                  .values
+                  .toList();
 
-    if (rs.isValidUrl(url)) {
-      http.Response response = await http.get(url + 'products.json');
-
-      if (response.statusCode == 200) {
-        Map<String, dynamic> data = json.decode(response.body);
-        if (data != null) {
-          final List<Product> remoteProducts = data
-              .map((String id, dynamic m) {
-                Product product = Product.fromMap(m);
-                return MapEntry(id, product);
-              })
-              .values
-              .toList();
-
-          remoteProducts.forEach((Product p) {
-            if (_products.containsKey(p.localId) == false) {
-              _products[p.localId] = p.setInSync(true);
+              remoteProducts.forEach((Product p) {
+                if (_products.containsKey(p.localId) == false) {
+                  _products[p.localId] = p.setInSync(true);
+                }
+              });
+              notifyListeners();
             }
-          });
-          notifyListeners();
-        }
+          } else {
+            print(
+                'Fetching products from Remote Storage failed: HTTP ${response.statusCode} | ' +
+                    response.reasonPhrase);
+          }
+          return null;
+        });
       } else {
-        print(
-            'Fetching products from Remote Storage failed: HTTP ${response.statusCode} | ' +
-                response.reasonPhrase);
+        print('Missing corret remote storage URL.');
+        return null;
       }
-    } else {
-      print('Missing corret remote storage URL.');
-    }
+    }).then((_) {
+      _products.forEach((_, Product p) => syncProduct(p));
+    });
   }
 
   ProductsModel selectProduct(int index) {
@@ -95,7 +100,7 @@ class ProductsModel extends Model {
     return this;
   }
 
-  void syncManually(Product product) async {
+  void syncProduct(Product product) async {
     if (product.inSync == false) {
       if (product.remoteId.length <= 0) {
         _syncNewProduct(product);
