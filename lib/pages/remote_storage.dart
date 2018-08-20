@@ -1,9 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/remote_storage.dart';
 
 class RemoteStoragePage extends StatefulWidget {
   final RemoteStorage remoteStorage = RemoteStorage();
+  final bool asSetup;
+
+  RemoteStoragePage({@required this.asSetup});
 
   @override
   State<StatefulWidget> createState() {
@@ -14,19 +18,46 @@ class RemoteStoragePage extends StatefulWidget {
 class _RemoteStorageState extends State<RemoteStoragePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String _firebaseUrl;
+  String _apiKey;
+  bool _setupComplete;
 
   @override
   void initState() {
     super.initState();
-    widget.remoteStorage.readUrl().then((String url) {
+    Future.wait([
+      widget.remoteStorage.isSetupComplete(),
+      widget.remoteStorage.readApiKey(),
+      widget.remoteStorage.readUrl(),
+    ]).then((List<dynamic> results) {
+      if (results[0]) {
+        // TODO: auto-redirect to /auth
+      }
       setState(() {
-        _firebaseUrl = url;
+        _setupComplete = results[0];
+        _apiKey = results[1];
+        _firebaseUrl = results[2];
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_setupComplete == null) {
+      return Scaffold(
+        appBar: AppBar(title: Text('Setup')),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    } else {
+      return widget.asSetup
+          ? Scaffold(
+              appBar: AppBar(title: Text('Setup')),
+              body: _buildCard(context),
+            )
+          : _buildCard(context);
+    }
+  }
+
+  Widget _buildCard(BuildContext context) {
     final double deviceWidth = MediaQuery.of(context).size.width;
     final double targetWidth =
         MediaQuery.of(context).orientation == Orientation.landscape
@@ -61,6 +92,19 @@ class _RemoteStorageState extends State<RemoteStoragePage> {
                   return null;
                 },
               ),
+              TextFormField(
+                controller: TextEditingController(text: _apiKey),
+                autocorrect: false,
+                decoration: InputDecoration(labelText: 'API key'),
+                keyboardType: TextInputType.text,
+                onSaved: (String v) => _apiKey = v,
+                validator: (String v) {
+                  if (v.isEmpty) {
+                    return 'A non-empty API key is required.';
+                  }
+                  return null;
+                },
+              ),
               SizedBox(
                 height: 10.0,
               ),
@@ -73,6 +117,12 @@ class _RemoteStorageState extends State<RemoteStoragePage> {
                     widget.remoteStorage.writeUrl(_firebaseUrl).then((_) {
                       setState(() {});
                     });
+                    widget.remoteStorage.writeApiKey(_apiKey).then((_) {
+                      setState(() {});
+                    });
+                    if (widget.asSetup) {
+                      Navigator.pushReplacementNamed(context, '/auth');
+                    }
                   }
                 },
               ),

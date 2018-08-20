@@ -16,6 +16,8 @@ class _AuthPageState extends State<AuthPage> {
     'password': null,
   };
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _signup = false;
+  final TextEditingController _pwdController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +60,7 @@ class _AuthPageState extends State<AuthPage> {
                       height: 11.0,
                     ),
                     TextFormField(
+                      controller: _pwdController,
                       decoration: InputDecoration(
                           labelText: 'Password',
                           filled: true,
@@ -66,18 +69,25 @@ class _AuthPageState extends State<AuthPage> {
                       onSaved: (String v) => _formData['password'] = v,
                       validator: (String v) {
                         if (v.isEmpty) {
-                          return 'Non empty email address is required.';
+                          return 'Non empty password is required.';
+                        }
+                        if (v.length < 6) {
+                          return 'Minimum expected password length is 6 characters.';
                         }
                       },
                     ),
                     SizedBox(
                       height: 10.0,
                     ),
+                    _buildPwdCheck(context),
+                    SizedBox(
+                      height: _signup ? 10.0 : 0.0,
+                    ),
                     ScopedModelDescendant<MainModel>(
                       builder: (BuildContext context, Widget child,
                           MainModel model) {
                         return RaisedButton(
-                          child: Text('LOGIN'),
+                          child: _signup ? Text('SIGN UP') : Text('LOGIN'),
                           color: Theme.of(context).accentColor,
                           textColor: Colors.yellowAccent,
                           onPressed: () {
@@ -85,13 +95,42 @@ class _AuthPageState extends State<AuthPage> {
                               return;
                             }
                             _formKey.currentState.save();
-                            model.login(
-                                _formData['email'], _formData['password']);
-                            Navigator.pushReplacementNamed(context, '/all');
+                            if (_signup) {
+                              model
+                                  .signup(
+                                      _formData['email'], _formData['password'])
+                                  .then((_) {
+                                Navigator.pushReplacementNamed(context, '/all');
+                              }).catchError((e) {
+                                _showError(context, 'Sign Up Failed', e);
+                              });
+                            } else {
+                              model
+                                  .login(
+                                      _formData['email'], _formData['password'])
+                                  .then((_) {
+                                Navigator.pushReplacementNamed(context, '/all');
+                              }).catchError((e) {
+                                _showError(context, 'Authentication Failed', e);
+                              });
+                            }
                           },
                         );
                       },
-                    )
+                    ),
+                    SizedBox(
+                      height: 20.0,
+                    ),
+                    FlatButton(
+                      child: _signup
+                          ? Text('Switch to Login')
+                          : Text('Switch to Sign Up'),
+                      onPressed: () {
+                        setState(() {
+                          _signup = !_signup;
+                        });
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -100,5 +139,44 @@ class _AuthPageState extends State<AuthPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildPwdCheck(BuildContext context) {
+    return (_signup
+        ? TextFormField(
+            decoration: InputDecoration(
+                labelText: 'Confirm Password',
+                filled: true,
+                fillColor: Colors.white),
+            obscureText: true,
+            validator: (String v) {
+              if (v.isEmpty) {
+                return 'Non empty confirmation password is required.';
+              }
+              if (_pwdController.text != v) {
+                return 'Password Confirmation must match Password.';
+              }
+            },
+          )
+        : Container());
+  }
+
+  void _showError(BuildContext context, String title, Object e) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(e),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('DISMISS'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
   }
 }

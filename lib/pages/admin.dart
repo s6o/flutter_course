@@ -45,7 +45,9 @@ class AdminPage extends StatelessWidget {
           children: <Widget>[
             ProductEditPage(),
             ProductListPage(model),
-            RemoteStoragePage(),
+            RemoteStoragePage(
+              asSetup: false,
+            ),
           ],
         ),
       ),

@@ -31,7 +31,8 @@ class ProductCard extends StatelessWidget {
                         .pushNamed<int>(context, '/product/' + index.toString())
                         .then<void>((int rindex) {
                       if (rindex >= 0) {
-                        model.selectProduct(rindex)..deleteProduct();
+                        model.selectProduct(rindex)
+                          ..deleteProduct(model.user.idToken);
                       }
                     });
                   },
@@ -45,7 +46,7 @@ class ProductCard extends StatelessWidget {
                     model.selectProduct(index)..toggleFavorite();
                   },
                 ),
-                SyncButton(product, model.syncProduct),
+                SyncButton(product, model.syncProduct, model.user.idToken),
               ],
             )
           ],

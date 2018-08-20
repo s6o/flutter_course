@@ -38,7 +38,7 @@ class ProductsModel extends Model {
     notifyListeners();
   }
 
-  void deleteProduct() {
+  void deleteProduct(String idToken) {
     if (_selectedIndex != null && _selectedIndex >= 0) {
       final Product delProduct = _showFavorites
           ? displayedProducts[_selectedIndex]
@@ -46,18 +46,20 @@ class ProductsModel extends Model {
 
       _products[delProduct.localId] = delProduct.toTrash();
       _selectedIndex = null;
-      syncProduct(delProduct);
+      syncProduct(delProduct, idToken);
       notifyListeners();
     }
   }
 
-  Future<Null> fetchProducts() async {
+  Future<Null> fetchProducts(String idToken) async {
     print('Fetching remote products...');
 
     RemoteStorage rs = RemoteStorage();
     rs.readUrl().then((String url) {
       if (rs.isValidUrl(url)) {
-        return http.get(url + 'products.json').then((http.Response response) {
+        return http
+            .get(url + 'products.json?auth=' + idToken)
+            .then((http.Response response) {
           if (response.statusCode == 200) {
             Map<String, dynamic> data = json.decode(response.body);
             if (data != null) {
@@ -88,7 +90,7 @@ class ProductsModel extends Model {
         return null;
       }
     }).then((_) {
-      _products.forEach((_, Product p) => syncProduct(p));
+      _products.forEach((_, Product p) => syncProduct(p, idToken));
     });
   }
 
@@ -100,33 +102,34 @@ class ProductsModel extends Model {
     return this;
   }
 
-  void syncProduct(Product product) async {
+  void syncProduct(Product product, String idToken) async {
     if (product.inSync == false) {
       if (product.remoteId.length <= 0) {
-        _syncNewProduct(product);
+        _syncNewProduct(product, idToken);
       } else if (product.remoteId.length > 0) {
-        _syncUpdatedProduct(product);
+        _syncUpdatedProduct(product, idToken);
       }
     }
 
     if (product.inTrash) {
-      _syncRemovedProduct(product);
+      _syncRemovedProduct(product, idToken);
     }
   }
 
-  void _syncNewProduct(Product product) async {
+  void _syncNewProduct(Product product, String idToken) async {
     RemoteStorage rs = RemoteStorage();
     String url = await rs.readUrl();
 
     if (rs.isValidUrl(url)) {
-      http.Response response =
-          await http.post(url + 'products.json', body: toJson(product));
+      http.Response response = await http
+          .post(url + 'products.json?auth=' + idToken, body: toJson(product));
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.body);
         final Product remoteProduct = product.setRemoteId(data['name']);
 
         http
-            .put(url + 'products/${remoteProduct.remoteId}.json',
+            .put(
+                url + 'products/${remoteProduct.remoteId}.json?auth=' + idToken,
                 body: toJson(remoteProduct))
             .then((http.Response response) {
           if (response.statusCode == 200) {
@@ -147,14 +150,14 @@ class ProductsModel extends Model {
     }
   }
 
-  void _syncRemovedProduct(Product product) async {
+  void _syncRemovedProduct(Product product, String idToken) async {
     RemoteStorage rs = RemoteStorage();
     String url = await rs.readUrl();
 
     if (rs.isValidUrl(url)) {
       if (product.remoteId != null && product.remoteId.length > 0) {
         http
-            .delete(url + 'products/${product.remoteId}.json')
+            .delete(url + 'products/${product.remoteId}.json?auth=' + idToken)
             .then((http.Response response) {
           if (response.statusCode == 200) {
             _products.remove(product.localId);
@@ -173,14 +176,14 @@ class ProductsModel extends Model {
     }
   }
 
-  void _syncUpdatedProduct(Product product) async {
+  void _syncUpdatedProduct(Product product, String idToken) async {
     RemoteStorage rs = RemoteStorage();
     String url = await rs.readUrl();
 
     if (rs.isValidUrl(url)) {
       if (product.remoteId != null && product.remoteId.length > 0) {
         http
-            .put(url + 'products/${product.remoteId}.json',
+            .put(url + 'products/${product.remoteId}.json?auth=' + idToken,
                 body: toJson(product))
             .then((http.Response response) {
           if (response.statusCode == 200) {

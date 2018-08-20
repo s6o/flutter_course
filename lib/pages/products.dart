@@ -19,7 +19,7 @@ class _ProductsState extends State<ProductsPage> {
   @override
   void initState() {
     super.initState();
-    widget.model.fetchProducts();
+    widget.model.fetchProducts(widget.model.user.idToken);
   }
 
   @override
@@ -57,7 +57,7 @@ class _ProductsState extends State<ProductsPage> {
       body: ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
           return RefreshIndicator(
-              onRefresh: model.fetchProducts,
+              onRefresh: () => model.fetchProducts(model.user.idToken),
               child: _buildProductList(context, model));
         },
       ),

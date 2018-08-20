@@ -6,6 +6,7 @@ import './pages/auth.dart';
 import './pages/admin.dart';
 import './pages/products.dart';
 import './pages/product_detail.dart';
+import './pages/remote_storage.dart';
 import './scoped-models/main_model.dart';
 
 void main() {
@@ -34,9 +35,10 @@ class _MyAppState extends State<MyApp> {
           accentColor: Colors.deepPurpleAccent,
           buttonColor: Colors.deepPurple,
         ),
-        home: AuthPage(),
+        home: RemoteStoragePage(asSetup: true),
         routes: {
           '/all': (BuildContext context) => ProductsPage(mainModel),
+          '/auth': (BuildContext context) => AuthPage(),
           '/admin': (BuildContext context) => AdminPage(mainModel),
         },
         onGenerateRoute: (RouteSettings settings) {
