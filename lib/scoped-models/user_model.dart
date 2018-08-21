@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,6 +12,20 @@ class UserModel extends Model {
 
   User get user {
     return _authenticatedUser;
+  }
+
+  void restoreUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String data = prefs.getString('user');
+    if (data != null) {
+      final User restoredUser = User.fromMap(json.decode(data));
+      final DateTime current = DateTime.now().toUtc();
+      if (current.millisecondsSinceEpoch <
+          restoredUser.expiration().millisecondsSinceEpoch) {
+        _authenticatedUser = restoredUser;
+        notifyListeners();
+      }
+    }
   }
 
   Future<User> login(String email, String password) async {
@@ -115,7 +130,15 @@ class UserModel extends Model {
           email: result['email'],
           idToken: result['idToken'],
           refreshToken: result['refreshToken'],
-          expiresInSeconds: expires == null ? 3600 : expires);
+          expirationPeriod: expires == null
+              ? Duration(seconds: 3600)
+              : Duration(seconds: expires));
+      SharedPreferences.getInstance().then((SharedPreferences prefs) {
+        prefs.setString('user', _authenticatedUser.toJson());
+      }).catchError((e) {
+        print('Failed to store User in SharedPreferences' + e.toString());
+      });
+      notifyListeners();
       return Future.value(_authenticatedUser);
     } else {
       return Future.error('Unexpected response, missing data to create user.');

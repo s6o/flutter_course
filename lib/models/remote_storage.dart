@@ -24,7 +24,7 @@ class RemoteStorage {
     return Future.wait([
       _localFileApiKey.then((File f) => f.exists()),
       _localFileFirebase.then((File f) => f.exists()),
-      readApiKey().then((String ak) => ak.isNotEmpty),
+      readApiKey().then((String ak) => ak != null && ak.isNotEmpty),
       readUrl().then(isValidUrl),
     ]).then((List<bool> flags) => flags.every((bool f) => f));
   }

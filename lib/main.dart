@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 import './pages/auth.dart';
@@ -24,22 +25,29 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final _mainModel = MainModel();
+
+  @override
+  void initState() {
+    _mainModel.restoreUser();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final MainModel mainModel = MainModel();
     return ScopedModel<MainModel>(
-      model: mainModel,
+      model: _mainModel,
       child: MaterialApp(
         theme: ThemeData(
           primarySwatch: Colors.deepPurple,
           accentColor: Colors.deepPurpleAccent,
           buttonColor: Colors.deepPurple,
         ),
-        home: RemoteStoragePage(asSetup: true),
+        home: RemoteStoragePage(asSetup: true, model: _mainModel),
         routes: {
-          '/all': (BuildContext context) => ProductsPage(mainModel),
+          '/all': (BuildContext context) => ProductsPage(_mainModel),
           '/auth': (BuildContext context) => AuthPage(),
-          '/admin': (BuildContext context) => AdminPage(mainModel),
+          '/admin': (BuildContext context) => AdminPage(_mainModel),
         },
         onGenerateRoute: (RouteSettings settings) {
           final List<String> pathElements = settings.name.split('/');
@@ -60,7 +68,7 @@ class _MyAppState extends State<MyApp> {
         },
         onUnknownRoute: (RouteSettings settings) {
           return MaterialPageRoute(
-              builder: (BuildContext context) => ProductsPage(mainModel));
+              builder: (BuildContext context) => ProductsPage(_mainModel));
         },
       ),
     );

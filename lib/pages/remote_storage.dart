@@ -2,12 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../models/remote_storage.dart';
+import '../scoped-models/main_model.dart';
 
 class RemoteStoragePage extends StatefulWidget {
   final RemoteStorage remoteStorage = RemoteStorage();
   final bool asSetup;
+  final MainModel model;
 
-  RemoteStoragePage({@required this.asSetup});
+  RemoteStoragePage({@required this.asSetup, this.model});
 
   @override
   State<StatefulWidget> createState() {
@@ -121,7 +123,11 @@ class _RemoteStorageState extends State<RemoteStoragePage> {
                       setState(() {});
                     });
                     if (widget.asSetup) {
-                      Navigator.pushReplacementNamed(context, '/auth');
+                      if (widget.model.user != null) {
+                        Navigator.pushReplacementNamed(context, '/all');
+                      } else {
+                        Navigator.pushReplacementNamed(context, '/auth');
+                      }
                     }
                   }
                 },
