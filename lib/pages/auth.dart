@@ -98,21 +98,23 @@ class _AuthPageState extends State<AuthPage> {
                             if (_signup) {
                               model
                                   .signup(
-                                      _formData['email'], _formData['password'])
-                                  .then((_) {
-                                Navigator.pushReplacementNamed(context, '/all');
-                              }).catchError((e) {
-                                _showError(context, 'Sign Up Failed', e);
-                              });
+                                    _formData['email'],
+                                    _formData['password'],
+                                  )
+                                  .then((_) => Navigator.pushReplacementNamed(
+                                      context, '/all'))
+                                  .catchError((e) =>
+                                      _showError(context, 'Sign Up Failed', e));
                             } else {
                               model
                                   .login(
-                                      _formData['email'], _formData['password'])
-                                  .then((_) {
-                                Navigator.pushReplacementNamed(context, '/all');
-                              }).catchError((e) {
-                                _showError(context, 'Authentication Failed', e);
-                              });
+                                    _formData['email'],
+                                    _formData['password'],
+                                  )
+                                  .then((_) => Navigator.pushReplacementNamed(
+                                      context, '/all'))
+                                  .catchError((e) => _showError(
+                                      context, 'Authentication Failed', e));
                             }
                           },
                         );

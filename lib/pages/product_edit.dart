@@ -90,9 +90,7 @@ class _ProductEditState extends State<ProductEditPage> {
 
     return Card(
       child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
         child: Container(
           margin: EdgeInsets.all(10.0),
           child: Form(

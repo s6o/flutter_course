@@ -21,8 +21,10 @@ class ProductListPage extends StatefulWidget {
 class _ProductListState extends State<ProductListPage> {
   @override
   void initState() {
+    if (widget.model.user != null) {
+      widget.model.fetchProducts(widget.model.user);
+    }
     super.initState();
-    widget.model.fetchProducts(widget.model.user.idToken);
   }
 
   @override
@@ -32,7 +34,7 @@ class _ProductListState extends State<ProductListPage> {
         final List<Product> products = model.products;
 
         return RefreshIndicator(
-          onRefresh: () => model.fetchProducts(model.user.idToken),
+          onRefresh: () => model.fetchProducts(model.user),
           child: ListView.builder(
             itemBuilder: (BuildContext context, int index) {
               return Dismissible(
@@ -42,8 +44,7 @@ class _ProductListState extends State<ProductListPage> {
                 direction: DismissDirection.endToStart,
                 onDismissed: (DismissDirection direction) {
                   if (direction == DismissDirection.endToStart) {
-                    model.selectProduct(index)
-                      ..deleteProduct(model.user.idToken);
+                    model.selectProduct(index)..deleteProduct(model.user);
                   }
                 },
                 child: Column(
@@ -57,8 +58,8 @@ class _ProductListState extends State<ProductListPage> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
-                          SyncButton(products[index], model.syncProduct,
-                              model.user.idToken),
+                          SyncButton(
+                              products[index], model.syncProduct, model.user),
                           IconButton(
                             icon: Icon(Icons.edit),
                             onPressed: () {

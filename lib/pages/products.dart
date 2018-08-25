@@ -3,6 +3,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../widgets/product_card.dart';
 import '../scoped-models/main_model.dart';
+import '../widgets/logout_tile.dart';
 
 class ProductsPage extends StatefulWidget {
   final MainModel model;
@@ -18,8 +19,10 @@ class ProductsPage extends StatefulWidget {
 class _ProductsState extends State<ProductsPage> {
   @override
   void initState() {
+    if (widget.model.user != null) {
+      widget.model.fetchProducts(widget.model.user);
+    }
     super.initState();
-    widget.model.fetchProducts(widget.model.user.idToken);
   }
 
   @override
@@ -37,6 +40,8 @@ class _ProductsState extends State<ProductsPage> {
               title: Text('Manage Products'),
               onTap: () => Navigator.pushNamed(context, '/admin'),
             ),
+            Divider(),
+            LogoutTile(),
           ],
         ),
       ),
@@ -57,7 +62,7 @@ class _ProductsState extends State<ProductsPage> {
       body: ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
           return RefreshIndicator(
-              onRefresh: () => model.fetchProducts(model.user.idToken),
+              onRefresh: () => model.fetchProducts(model.user),
               child: _buildProductList(context, model));
         },
       ),

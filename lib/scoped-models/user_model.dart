@@ -9,13 +9,19 @@ import '../models/user.dart';
 
 class UserModel extends Model {
   User _authenticatedUser;
+  Timer _authTimer;
+  bool _setupRequired = true;
 
   User get user {
     return _authenticatedUser;
   }
 
   void restoreUser() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final RemoteStorage rs = RemoteStorage();
+    bool setupComplete = await rs.isSetupComplete();
+    _setupRequired = !setupComplete;
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String data = prefs.getString('user');
     if (data != null) {
       final User restoredUser = User.fromMap(json.decode(data));
@@ -23,9 +29,14 @@ class UserModel extends Model {
       if (current.millisecondsSinceEpoch <
           restoredUser.expiration().millisecondsSinceEpoch) {
         _authenticatedUser = restoredUser;
-        notifyListeners();
+        setAutoLogout(restoredUser.expiration().difference(current));
       }
     }
+    notifyListeners();
+  }
+
+  bool get setupRequired {
+    return _setupRequired;
   }
 
   Future<User> login(String email, String password) async {
@@ -53,6 +64,16 @@ class UserModel extends Model {
     }
   }
 
+  void logout() async {
+    _authTimer.cancel();
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user');
+
+    _authenticatedUser = null;
+    notifyListeners();
+  }
+
   Future<User> signup(String email, String password) async {
     RemoteStorage rs = RemoteStorage();
     String url =
@@ -76,6 +97,10 @@ class UserModel extends Model {
       String msg = _errorMessage(response);
       return Future.error(msg);
     }
+  }
+
+  void setAutoLogout(Duration when) async {
+    _authTimer = Timer(when, () => logout());
   }
 
   String _errorMessage(http.Response response) {
@@ -138,6 +163,8 @@ class UserModel extends Model {
       }).catchError((e) {
         print('Failed to store User in SharedPreferences' + e.toString());
       });
+      final DateTime current = DateTime.now().toUtc();
+      setAutoLogout(_authenticatedUser.expiration().difference(current));
       notifyListeners();
       return Future.value(_authenticatedUser);
     } else {

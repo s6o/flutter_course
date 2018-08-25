@@ -19,27 +19,25 @@ class RemoteStoragePage extends StatefulWidget {
 
 class _RemoteStorageState extends State<RemoteStoragePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Map<String, String> _formData = Map();
   String _firebaseUrl;
   String _apiKey;
   bool _setupComplete;
 
   @override
   void initState() {
-    super.initState();
     Future.wait([
       widget.remoteStorage.isSetupComplete(),
       widget.remoteStorage.readApiKey(),
       widget.remoteStorage.readUrl(),
     ]).then((List<dynamic> results) {
-      if (results[0]) {
-        // TODO: auto-redirect to /auth
-      }
       setState(() {
         _setupComplete = results[0];
         _apiKey = results[1];
         _firebaseUrl = results[2];
       });
     });
+    super.initState();
   }
 
   @override
@@ -80,7 +78,7 @@ class _RemoteStorageState extends State<RemoteStoragePage> {
                 autocorrect: false,
                 decoration: InputDecoration(labelText: 'Firebase URL'),
                 keyboardType: TextInputType.url,
-                onSaved: (String v) => _firebaseUrl = v,
+                onSaved: (String v) => _formData['url'] = v,
                 validator: (String v) {
                   if (v.isEmpty) {
                     return 'A non-empty product title is required.';
@@ -99,7 +97,7 @@ class _RemoteStorageState extends State<RemoteStoragePage> {
                 autocorrect: false,
                 decoration: InputDecoration(labelText: 'API key'),
                 keyboardType: TextInputType.text,
-                onSaved: (String v) => _apiKey = v,
+                onSaved: (String v) => _formData['key'] = v,
                 validator: (String v) {
                   if (v.isEmpty) {
                     return 'A non-empty API key is required.';
@@ -116,19 +114,25 @@ class _RemoteStorageState extends State<RemoteStoragePage> {
                 onPressed: () {
                   if (_formKey.currentState.validate()) {
                     _formKey.currentState.save();
-                    widget.remoteStorage.writeUrl(_firebaseUrl).then((_) {
-                      setState(() {});
-                    });
-                    widget.remoteStorage.writeApiKey(_apiKey).then((_) {
-                      setState(() {});
-                    });
-                    if (widget.asSetup) {
-                      if (widget.model.user != null) {
-                        Navigator.pushReplacementNamed(context, '/all');
-                      } else {
-                        Navigator.pushReplacementNamed(context, '/auth');
+                    Future.wait([
+                      widget.remoteStorage.writeUrl(_formData['url']),
+                      widget.remoteStorage.writeApiKey(_formData['key'])
+                    ]).then((_) {
+                      setState(() {
+                        _firebaseUrl = _formData['url'];
+                        _apiKey = _formData['key'];
+                      });
+                    }).then((_) {
+                      if (widget.asSetup) {
+                        if (widget.model.user != null) {
+                          Navigator.pushReplacementNamed(context, '/all');
+                        } else {
+                          Navigator.pushReplacementNamed(context, '/auth');
+                        }
                       }
-                    }
+                    }).catchError((e) {
+                      print('Setup failure: ${e.toString()}');
+                    });
                   }
                 },
               ),

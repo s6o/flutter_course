@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../models/product.dart';
 import '../models/remote_storage.dart';
+import '../models/user.dart';
 
 class ProductsModel extends Model {
   Map<int, Product> _products = Map();
@@ -38,27 +39,31 @@ class ProductsModel extends Model {
     notifyListeners();
   }
 
-  void deleteProduct(String idToken) {
-    if (_selectedIndex != null && _selectedIndex >= 0) {
+  void deleteProduct(User user) {
+    if (_selectedIndex != null && _selectedIndex >= 0 && user != null) {
       final Product delProduct = _showFavorites
           ? displayedProducts[_selectedIndex]
           : products[_selectedIndex];
 
       _products[delProduct.localId] = delProduct.toTrash();
       _selectedIndex = null;
-      syncProduct(delProduct, idToken);
+      syncProduct(delProduct, user);
       notifyListeners();
     }
   }
 
-  Future<Null> fetchProducts(String idToken) async {
+  Future<Null> fetchProducts(User user) async {
     print('Fetching remote products...');
+
+    if (user == null) {
+      return Future.value(null);
+    }
 
     RemoteStorage rs = RemoteStorage();
     rs.readUrl().then((String url) {
       if (rs.isValidUrl(url)) {
         return http
-            .get(url + 'products.json?auth=' + idToken)
+            .get(url + 'products.json?auth=' + user.idToken)
             .then((http.Response response) {
           if (response.statusCode == 200) {
             Map<String, dynamic> data = json.decode(response.body);
@@ -90,7 +95,7 @@ class ProductsModel extends Model {
         return null;
       }
     }).then((_) {
-      _products.forEach((_, Product p) => syncProduct(p, idToken));
+      _products.forEach((_, Product p) => syncProduct(p, user));
     });
   }
 
@@ -102,17 +107,19 @@ class ProductsModel extends Model {
     return this;
   }
 
-  void syncProduct(Product product, String idToken) async {
-    if (product.inSync == false) {
-      if (product.remoteId.length <= 0) {
-        _syncNewProduct(product, idToken);
-      } else if (product.remoteId.length > 0) {
-        _syncUpdatedProduct(product, idToken);
+  void syncProduct(Product product, User user) async {
+    if (user != null) {
+      if (product.inSync == false) {
+        if (product.remoteId.length <= 0) {
+          _syncNewProduct(product, user.idToken);
+        } else if (product.remoteId.length > 0) {
+          _syncUpdatedProduct(product, user.idToken);
+        }
       }
-    }
 
-    if (product.inTrash) {
-      _syncRemovedProduct(product, idToken);
+      if (product.inTrash) {
+        _syncRemovedProduct(product, user.idToken);
+      }
     }
   }
 

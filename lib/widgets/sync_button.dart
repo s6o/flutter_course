@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../models/product.dart';
+import '../models/user.dart';
 
-typedef SyncCallback = void Function(Product p, String idToken);
+typedef SyncCallback = void Function(Product p, User user);
 
 class SyncButton extends StatelessWidget {
   final Product product;
   final SyncCallback syncCallback;
-  final String idToken;
+  final User user;
 
-  SyncButton(this.product, this.syncCallback, this.idToken);
+  SyncButton(this.product, this.syncCallback, this.user);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class SyncButton extends StatelessWidget {
       color: product.inSync ? Colors.deepPurple : Colors.blueGrey,
       icon: Icon(product.inSync ? Icons.sync : Icons.sync_disabled),
       onPressed: () {
-        syncCallback(product, idToken);
+        syncCallback(product, user);
       },
     );
   }

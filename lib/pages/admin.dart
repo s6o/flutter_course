@@ -4,6 +4,7 @@ import './product_edit.dart';
 import './product_list.dart';
 import './remote_storage.dart';
 import '../scoped-models/main_model.dart';
+import '../widgets/logout_tile.dart';
 
 class AdminPage extends StatelessWidget {
   final MainModel model;
@@ -27,6 +28,8 @@ class AdminPage extends StatelessWidget {
                 title: Text('All Products'),
                 onTap: () => Navigator.pushReplacementNamed(context, '/all'),
               ),
+              Divider(),
+              LogoutTile(),
             ],
           ),
         ),
