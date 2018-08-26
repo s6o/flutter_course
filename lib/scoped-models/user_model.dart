@@ -71,7 +71,6 @@ class UserModel extends Model {
     await prefs.remove('user');
 
     _authenticatedUser = null;
-    notifyListeners();
   }
 
   Future<User> signup(String email, String password) async {
@@ -100,7 +99,10 @@ class UserModel extends Model {
   }
 
   void setAutoLogout(Duration when) async {
-    _authTimer = Timer(when, () => logout());
+    _authTimer = Timer(when, () {
+      logout();
+      notifyListeners();
+    });
   }
 
   String _errorMessage(http.Response response) {
