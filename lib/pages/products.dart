@@ -70,11 +70,11 @@ class _ProductsState extends State<ProductsPage> {
   }
 
   Widget _buildProductList(BuildContext context, MainModel model) {
-    return model.displayedProducts.length > 0
+    return model.displayedProducts(model.user).length > 0
         ? ListView.builder(
             itemBuilder: (BuildContext context, int index) =>
                 ProductCard(index),
-            itemCount: model.displayedProducts.length,
+            itemCount: model.displayedProducts(model.user).length,
           )
         : Center(child: Text('No products, add some.'));
   }

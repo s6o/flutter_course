@@ -20,10 +20,10 @@ class ProductsModel extends Model {
     return _showFavorites;
   }
 
-  List<Product> get displayedProducts {
-    if (_showFavorites) {
+  List<Product> displayedProducts(User user) {
+    if (_showFavorites && user != null) {
       return _products.values
-          .where((Product p) => p.isFavorite && !p.inTrash)
+          .where((Product p) => p.isFavorite(user.id) && !p.inTrash)
           .toList();
     }
     return products;
@@ -42,7 +42,7 @@ class ProductsModel extends Model {
   void deleteProduct(User user) {
     if (_selectedIndex != null && _selectedIndex >= 0 && user != null) {
       final Product delProduct = _showFavorites
-          ? displayedProducts[_selectedIndex]
+          ? displayedProducts(user).elementAt(_selectedIndex)
           : products[_selectedIndex];
 
       _products[delProduct.localId] = delProduct.toTrash();
@@ -210,11 +210,11 @@ class ProductsModel extends Model {
     }
   }
 
-  void toggleFavorite() {
-    if (_selectedIndex != null) {
-      final bool favStatus = products[_selectedIndex].isFavorite;
+  void toggleFavorite(User user) {
+    if (_selectedIndex != null && user != null) {
+      final bool favStatus = products[_selectedIndex].isFavorite(user.id);
       updateProduct(Product.fromProductWithFavorite(
-          products[_selectedIndex], !favStatus));
+          products[_selectedIndex], user.id, !favStatus));
     } else {
       print('toggleFavorite called with an invalid selectedIndex');
     }

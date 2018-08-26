@@ -15,7 +15,8 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<MainModel>(
         builder: (BuildContext context, Widget child, MainModel model) {
-      final Product product = model.displayedProducts[index];
+      final Product product =
+          model.displayedProducts(model.user).elementAt(index);
       return Card(
         child: Column(
           children: <Widget>[
@@ -38,11 +39,12 @@ class ProductCard extends StatelessWidget {
                 ),
                 IconButton(
                   color: Colors.red,
-                  icon: Icon(product.isFavorite
+                  icon: Icon(product
+                          .isFavorite(model.user == null ? '' : model.user.id)
                       ? Icons.favorite
                       : Icons.favorite_border),
                   onPressed: () {
-                    model.selectProduct(index)..toggleFavorite();
+                    model.selectProduct(index)..toggleFavorite(model.user);
                   },
                 ),
                 SyncButton(product, model.syncProduct, model.user),

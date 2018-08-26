@@ -5,6 +5,7 @@ class Product {
   String _remoteId = '';
   bool _inSync = false;
   bool _inTrash = false;
+  Set<String> _favorites = Set();
   final String userId;
   final String userEmail;
 
@@ -12,7 +13,6 @@ class Product {
   final String description;
   final double price;
   final String image;
-  final bool isFavorite;
 
   Product(
       {@required this.userId,
@@ -20,12 +20,12 @@ class Product {
       @required this.title,
       @required this.description,
       @required this.price,
-      @required this.image,
-      this.isFavorite = false});
+      @required this.image});
 
   Product.fromMap(Map<String, dynamic> m)
       : _localId = m.containsKey('lid') ? m['lid'] : 0,
         _remoteId = m.containsKey('rid') ? m['rid'] : '',
+        _favorites = m.containsKey('favs') ? Set.from(m['favs']) : Set(),
         userId = m.containsKey('uid') ? m['uid'] : 'XXX',
         userEmail = m.containsKey('email') ? m['email'] : 'tester@test.com',
         title = m.containsKey('title') ? m['title'] : 'Unknown product',
@@ -35,12 +35,14 @@ class Product {
             ? (m['image'] != null
                 ? m['image']
                 : 'https://images.yourstory.com/2016/08/125-fall-in-love.png?auto=compress')
-            : 'https://images.yourstory.com/2016/08/125-fall-in-love.png?auto=compress',
-        isFavorite = m.containsKey('isfav') ? m['isfav'] : false;
+            : 'https://images.yourstory.com/2016/08/125-fall-in-love.png?auto=compress';
 
   Product.fromMapWithMerge(Map<String, dynamic> m, Product p)
       : _localId = m.containsKey('lid') ? m['lid'] : p.localId,
         _remoteId = m.containsKey('rid') ? m['rid'] : p.remoteId,
+        _favorites = m.containsKey('favs')
+            ? Set.from(m['favs'] + p.favorites.toList())
+            : Set.from(p.favorites),
         userId = m.containsKey('uid') ? m['uid'] : p.userId,
         userEmail = m.containsKey('email') ? m['email'] : p.userEmail,
         title = m.containsKey('title') ? m['title'] : p.title,
@@ -48,12 +50,12 @@ class Product {
         price = m.containsKey('price') ? m['price'] : p.price,
         image = m.containsKey('image')
             ? (m['image'] != null ? m['image'] : p.image)
-            : p.image,
-        isFavorite = m.containsKey('isfav') ? m['isfav'] : p.isFavorite;
+            : p.image;
 
   Product.fromMapWithUser(Map<String, dynamic> m, String uid, String email)
       : _localId = m.containsKey('lid') ? m['lid'] : 0,
         _remoteId = m.containsKey('rid') ? m['rid'] : '',
+        _favorites = m.containsKey('favs') ? Set.from(m['favs']) : Set(),
         userId = uid,
         userEmail = email,
         title = m.containsKey('title') ? m['title'] : 'Unknown product',
@@ -63,19 +65,22 @@ class Product {
             ? (m['image'] != null
                 ? m['image']
                 : 'https://images.yourstory.com/2016/08/125-fall-in-love.png?auto=compress')
-            : 'https://images.yourstory.com/2016/08/125-fall-in-love.png?auto=compress',
-        isFavorite = m.containsKey('isfav') ? m['isfav'] : false;
+            : 'https://images.yourstory.com/2016/08/125-fall-in-love.png?auto=compress';
 
-  Product.fromProductWithFavorite(Product p, bool favorite)
+  Product.fromProductWithFavorite(Product p, String uid, bool favorite)
       : _localId = p.localId,
         _remoteId = p.remoteId,
+        _favorites = p.setFavorite(uid, favorite).favorites,
         userId = p.userId,
         userEmail = p.userEmail,
         title = p.title,
         description = p.description,
         price = p.price,
-        image = p.image,
-        isFavorite = favorite;
+        image = p.image;
+
+  Set<String> get favorites {
+    return _favorites;
+  }
 
   bool get inSync {
     return _inSync;
@@ -91,6 +96,15 @@ class Product {
 
   String get remoteId {
     return _remoteId;
+  }
+
+  bool isFavorite(String uid) {
+    return _favorites.contains(uid);
+  }
+
+  Product setFavorite(String uid, bool flag) {
+    flag ? _favorites.add(uid) : _favorites.remove(uid);
+    return this;
   }
 
   Product setLocaId(int id) {
@@ -122,7 +136,7 @@ class Product {
       'desc': description,
       'price': price,
       'image': image,
-      'isfav': isFavorite
+      'favs': _favorites.toList()
     };
     if (_remoteId != null && _remoteId.length > 0) {
       m['rid'] = _remoteId;
