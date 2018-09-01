@@ -10,9 +10,14 @@ class RemoteStorage {
     return directory.path;
   }
 
-  Future<File> get _localFileApiKey async {
+  Future<File> get _localFirebaseApiKey async {
     final path = await _localPath;
-    return File('$path/apikey.txt');
+    return File('$path/fbapikey.txt');
+  }
+
+  Future<File> get _localMapApiKey async {
+    final path = await _localPath;
+    return File('$path/gmapikey.txt');
   }
 
   Future<File> get _localFileFirebase async {
@@ -22,9 +27,10 @@ class RemoteStorage {
 
   Future<bool> isSetupComplete() {
     return Future.wait([
-      _localFileApiKey.then((File f) => f.exists()),
+      _localFirebaseApiKey.then((File f) => f.exists()),
+      _localMapApiKey.then((File f) => f.exists()),
       _localFileFirebase.then((File f) => f.exists()),
-      readApiKey().then((String ak) => ak != null && ak.isNotEmpty),
+      readFirebaseApiKey().then((String ak) => ak != null && ak.isNotEmpty),
       readUrl().then(isValidUrl),
     ]).then((List<bool> flags) => flags.every((bool f) => f));
   }
@@ -33,9 +39,20 @@ class RemoteStorage {
     return url.startsWith('https://') && url.endsWith('firebaseio.com/');
   }
 
-  Future<String> readApiKey() async {
+  Future<String> readFirebaseApiKey() async {
     try {
-      final file = await _localFileApiKey;
+      final file = await _localFirebaseApiKey;
+
+      String contents = await file.readAsString();
+      return contents;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Future<String> readMapApiKey() async {
+    try {
+      final file = await _localMapApiKey;
 
       String contents = await file.readAsString();
       return contents;
@@ -55,8 +72,13 @@ class RemoteStorage {
     }
   }
 
-  Future<File> writeApiKey(String ak) async {
-    final file = await _localFileApiKey;
+  Future<File> writeFirebaseApiKey(String ak) async {
+    final file = await _localFirebaseApiKey;
+    return file.writeAsString(ak);
+  }
+
+  Future<File> writeMapApiKey(String ak) async {
+    final file = await _localMapApiKey;
     return file.writeAsString(ak);
   }
 

@@ -50,7 +50,7 @@ class UserModel extends Model {
       'returnSecureToken': true
     };
 
-    final String apiKey = await rs.readApiKey();
+    final String apiKey = await rs.readFirebaseApiKey();
 
     final http.Response response = await http.post(url + apiKey,
         headers: {'Content-Type': 'application/json'},
@@ -84,7 +84,7 @@ class UserModel extends Model {
       'returnSecureToken': true
     };
 
-    final String apiKey = await rs.readApiKey();
+    final String apiKey = await rs.readFirebaseApiKey();
 
     final http.Response response = await http.post(url + apiKey,
         headers: {'Content-Type': 'application/json'},

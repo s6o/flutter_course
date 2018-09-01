@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:map_view/map_view.dart';
 
 import '../models/remote_storage.dart';
 import '../scoped-models/main_model.dart';
@@ -21,20 +22,23 @@ class _RemoteStorageState extends State<RemoteStoragePage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final Map<String, String> _formData = Map();
   String _firebaseUrl;
-  String _apiKey;
+  String _fbApiKey;
+  String _gmApiKey;
   bool _setupComplete;
 
   @override
   void initState() {
     Future.wait([
       widget.remoteStorage.isSetupComplete(),
-      widget.remoteStorage.readApiKey(),
+      widget.remoteStorage.readFirebaseApiKey(),
+      widget.remoteStorage.readMapApiKey(),
       widget.remoteStorage.readUrl(),
     ]).then((List<dynamic> results) {
       setState(() {
         _setupComplete = results[0];
-        _apiKey = results[1];
-        _firebaseUrl = results[2];
+        _fbApiKey = results[1];
+        _gmApiKey = results[2];
+        _firebaseUrl = results[3];
       });
     });
     super.initState();
@@ -93,14 +97,30 @@ class _RemoteStorageState extends State<RemoteStoragePage> {
                 },
               ),
               TextFormField(
-                controller: TextEditingController(text: _apiKey),
+                controller: TextEditingController(text: _fbApiKey),
                 autocorrect: false,
-                decoration: InputDecoration(labelText: 'API key'),
+                decoration: InputDecoration(labelText: 'Firebase API key'),
                 keyboardType: TextInputType.text,
-                onSaved: (String v) => _formData['key'] = v,
+                onSaved: (String v) => _formData['fbkey'] = v,
                 validator: (String v) {
                   if (v.isEmpty) {
-                    return 'A non-empty API key is required.';
+                    return 'A non-empty Firebase API key is required.';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(
+                height: 10.0,
+              ),
+              TextFormField(
+                controller: TextEditingController(text: _gmApiKey),
+                autocorrect: false,
+                decoration: InputDecoration(labelText: 'Google Maps API key'),
+                keyboardType: TextInputType.text,
+                onSaved: (String v) => _formData['gmkey'] = v,
+                validator: (String v) {
+                  if (v.isEmpty) {
+                    return 'A non-empty Google Maps API key is required.';
                   }
                   return null;
                 },
@@ -116,11 +136,15 @@ class _RemoteStorageState extends State<RemoteStoragePage> {
                     _formKey.currentState.save();
                     Future.wait([
                       widget.remoteStorage.writeUrl(_formData['url']),
-                      widget.remoteStorage.writeApiKey(_formData['key'])
+                      widget.remoteStorage
+                          .writeFirebaseApiKey(_formData['fbkey']),
+                      widget.remoteStorage.writeMapApiKey(_formData['gmkey'])
                     ]).then((_) {
+                      MapView.setApiKey(_formData['gmkey']);
                       setState(() {
                         _firebaseUrl = _formData['url'];
-                        _apiKey = _formData['key'];
+                        _fbApiKey = _formData['fbkey'];
+                        _gmApiKey = _formData['gmkey'];
                       });
                     }).then((_) {
                       if (widget.asSetup) {
