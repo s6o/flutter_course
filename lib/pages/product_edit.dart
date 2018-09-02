@@ -3,6 +3,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import '../models/product.dart';
 import '../scoped-models/main_model.dart';
+import '../widgets/location_input.dart';
 
 class ProductEditPage extends StatefulWidget {
   @override
@@ -111,7 +112,7 @@ class _ProductEditState extends State<ProductEditPage> {
                 ),
                 TextFormField(
                   decoration: InputDecoration(labelText: 'Description'),
-                  maxLines: 4,
+                  maxLines: 2,
                   onSaved: (String v) => _formData['desc'] = v,
                   initialValue: _initialValue('desc', model),
                   validator: (String v) {
@@ -133,6 +134,10 @@ class _ProductEditState extends State<ProductEditPage> {
                   },
                   initialValue: _initialValue('price', model),
                 ),
+                SizedBox(
+                  height: 10.0,
+                ),
+                LocationInput(),
                 SizedBox(
                   height: 10.0,
                 ),
