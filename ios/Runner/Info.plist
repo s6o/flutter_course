@@ -26,9 +26,9 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Location useage is required for Product location</string>
 	<key>UISupportedInterfaceOrientations</key>
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>Location useage is required for Product's location</string>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
